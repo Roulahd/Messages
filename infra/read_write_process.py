@@ -29,6 +29,6 @@ class ReadWriteProcess(object):
     def _execute_action(self):
         for i in range(self.messages_number):
             if self.action == Action.Read:
-                print(MessageManager.read_msg(i))
+                MessageManager.read_msg(i)
             else:
                 MessageManager.write_msg('My Message #: ' + str(i + 1))

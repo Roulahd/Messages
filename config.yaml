@@ -1,1 +1,2 @@
 TextFile: "messageManager.txt"
+RunOn: TextFile
