@@ -48,7 +48,13 @@ class MessagesUnitTest(unittest.TestCase):
         read_result = rp.run()
         wp.wait_for_other()
         rp.wait_for_other()
-        self.assertEqual(my_random_utf_8_str, read_result[0],
+
+        try:
+            read_result_msg = read_result[0].encode('utf-8')
+        except UnicodeDecodeError:
+            read_result_msg = read_result[0]
+
+        self.assertEqual(my_random_utf_8_str, read_result_msg,
                          'Actual: {0} Received: {1} Values are not Equal'.format(my_random_utf_8_str, read_result))
 
     def test_validate_multiple_messages(self):
