@@ -1,2 +1,3 @@
 TextFile: "messageManager.txt"
-RunOn: TextFile
+RunOn: "TF"
+#RunOn: "MDB"
