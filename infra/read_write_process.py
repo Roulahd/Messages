@@ -19,6 +19,7 @@ class ReadWriteProcess(object):
         self.action = action
         self.p = None
         self.messages = messages
+        self._validate_input()
 
     def run(self):
         manager = multiprocessing.Manager()
@@ -31,11 +32,14 @@ class ReadWriteProcess(object):
         self.p.join()
 
     def _execute_action(self, i, return_results):
+        if self.messages:
+            if self.messages_number > len(self.messages):
+                self.messages_number = len(self.messages)
         for i in range(self.messages_number):
             if self.action == Action.Read:
                 read_message = MessageManager.read_msg(i)
                 return_results.append(read_message)
-            else:
+            elif self.action == Action.Write:
                 if self.messages:
                     MessageManager.write_msg(self.messages[i])
                 else:
@@ -43,3 +47,12 @@ class ReadWriteProcess(object):
                     MessageManager.write_msg('My Message #: ' + str(i + 1))
                 return_results.append(self.messages)
 
+    def _validate_input(self):
+        if not isinstance(self.action, Action):
+            raise ValueError("Unknown Action")
+        if not isinstance(self.messages_number, int):
+            raise ValueError("Message Number is not an Integer")
+        elif self.messages_number <= 0:
+            raise ValueError("Message Number is Negative or Zero")
+        if not isinstance(self.messages, list) and self.messages is not None:
+            raise ValueError("Messages are not list or None")
