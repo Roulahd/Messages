@@ -93,7 +93,6 @@ class MessagesUnitTest(unittest.TestCase):
             if message not in messages:
                 self.fail('This message {0} was not written'.format(message))
 
-
     @staticmethod
     def random_utf8(length):
         return u''.join(unichr(random.randint(0x80, sys.maxunicode)) for _ in range(length))
