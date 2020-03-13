@@ -1,4 +1,4 @@
-from infra.MessageManager import MessageManager
+from infra.message_manager import MessageManager
 import multiprocessing
 
 
