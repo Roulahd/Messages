@@ -10,7 +10,7 @@ class Action(enum.Enum):
 
 class ReadWriteProcess(object):
 
-    def __init__(self, action, messages_number, message=None):
+    def __init__(self, action, messages_number, messages=None):
         """
         :param Action(action):
         :param int(messages_number):
@@ -18,7 +18,7 @@ class ReadWriteProcess(object):
         self.messages_number = messages_number
         self.action = action
         self.p = None
-        self.message = message
+        self.messages = messages
 
     def run(self):
         manager = multiprocessing.Manager()
@@ -36,10 +36,10 @@ class ReadWriteProcess(object):
                 read_message = MessageManager.read_msg(i)
                 return_results.append(read_message)
             else:
-                if self.message:
-                    MessageManager.write_msg(self.message)
+                if self.messages:
+                    MessageManager.write_msg(self.messages[i])
                 else:
-                    self.message = 'My Message #: ' + str(i + 1)
+                    self.messages = 'My Message #: ' + str(i + 1)
                     MessageManager.write_msg('My Message #: ' + str(i + 1))
-                return_results.append(self.message)
+                return_results.append(self.messages)
 
