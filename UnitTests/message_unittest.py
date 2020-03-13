@@ -6,6 +6,10 @@ from infra.read_write_process import ReadWriteProcess, Action
 class MessagesUnitTest(unittest.TestCase):
 
     def test_equal(self):
+        """
+        This unit test writes a random string consisted of 10 chars (digits, upper&lower case)
+        then reads and validates the value is equal with read process
+        """
         s = string.lowercase + string.uppercase + string.digits
         message = ''.join(random.sample(s, 10))
         wp = ReadWriteProcess(action=Action.Write, messages_number=1, messages=[message])
@@ -18,6 +22,10 @@ class MessagesUnitTest(unittest.TestCase):
                          .format(message, read_result))
 
     def test_notequal(self):
+        """
+        This unit test writes a random string consisted of 10 chars (digits, upper&lower case)
+        then reads a different string consisted of 9 chars and validates the values are different
+        """
         s = string.lowercase + string.uppercase + string.digits
         message = ''.join(random.sample(s, 10))
         wp = ReadWriteProcess(action=Action.Write, messages_number=1, messages=[message])
@@ -28,6 +36,10 @@ class MessagesUnitTest(unittest.TestCase):
                             .format(wrong_value, written_value[0]))
 
     def test_utf8(self):
+        """
+        This unit test writes a random utf8 string consisted of 12 chars
+        then reads and validates the value is equal with read process
+        """
         my_random_unicode_str = MessagesUnitTest.random_utf8(length=12)
         my_random_utf_8_str = my_random_unicode_str.encode('utf-8')
         wp = ReadWriteProcess(action=Action.Write, messages_number=1, messages=[my_random_utf_8_str])
@@ -40,6 +52,9 @@ class MessagesUnitTest(unittest.TestCase):
                          'Actual: {0} Received: {1} Values are not Equal'.format(my_random_utf_8_str, read_result))
 
     def test_validate_multiple_messages(self):
+        """
+        This unit test has one write and read processes, then validates read values are actually written
+        """
         messages = []
         s = string.lowercase + string.uppercase + string.digits
         for _ in range(100):
@@ -55,6 +70,9 @@ class MessagesUnitTest(unittest.TestCase):
                 self.fail('This message {0} was not written'.format(message))
 
     def test_validate_multiple_messages_three_processes(self):
+        """
+        This unit test has two write and one read processes, then validates read values are actually written
+        """
         messages = []
         messages2 = []
         s = string.lowercase + string.uppercase + string.digits
