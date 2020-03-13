@@ -1,0 +1,11 @@
+#############################################
+###                                       ###
+###   Dependencies for Messages Project   ###
+###                                       ###
+###    To Install all Requirements        ###
+###    Run the following:                 ###
+###    pip install -r requirements.txt    ###
+###                                       ###
+#############################################
+
+pymongo
