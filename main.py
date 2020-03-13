@@ -1,13 +1,24 @@
-from infra.read_write_process import ReadWriteProcess, Action
+from infra.MessageManager import MessageManager
+import multiprocessing
+
+
+def write_process():
+    for i in range(100):
+        MessageManager.write_msg('My Message #: ' + str(i+1))
+
+
+def read_process():
+    for i in range(100):
+        print(MessageManager.read_msg(i))
 
 
 def main():
-    wp = ReadWriteProcess(action=Action.Write, messages_number=100)
-    rp = ReadWriteProcess(action=Action.Read, messages_number=100)
-    wp.run()
-    rp.run()
-    wp.wait_for_other()
-    rp.wait_for_other()
+    wp = multiprocessing.Process(target=write_process)
+    rp = multiprocessing.Process(target=read_process)
+    wp.start()
+    rp.start()
+    wp.join()
+    rp.join()
 
 
 if __name__ == "__main__":
