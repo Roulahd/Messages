@@ -69,30 +69,6 @@ class MessagesUnitTest(unittest.TestCase):
             if message not in messages:
                 self.fail('This message {0} was not written'.format(message))
 
-    def test_validate_multiple_messages_three_processes(self):
-        """
-        This unit test has two write and one read processes, then validates read values are actually written
-        """
-        messages = []
-        messages2 = []
-        s = string.lowercase + string.uppercase + string.digits
-        for _ in range(1000):
-            messages.append(''.join(random.sample(s, 10)))
-            messages2.append(''.join(random.sample(s, 10)))
-        wp = ReadWriteProcess(action=Action.Write, messages_number=1000, messages=messages)
-        wp2 = ReadWriteProcess(action=Action.Write, messages_number=1000, messages=messages2)
-        rp = ReadWriteProcess(action=Action.Read, messages_number=1500)
-        messages.extend(messages2)
-        wp.run()
-        wp2.run()
-        read_results = rp.run()
-        wp.wait_for_other()
-        wp2.wait_for_other()
-        rp.wait_for_other()
-        for message in read_results:
-            if message not in messages:
-                self.fail('This message {0} was not written'.format(message))
-
     @staticmethod
     def random_utf8(length):
         return u''.join(unichr(random.randint(0x80, sys.maxunicode)) for _ in range(length))
