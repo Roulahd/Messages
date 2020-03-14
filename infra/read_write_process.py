@@ -22,9 +22,10 @@ class ReadWriteProcess(object):
         self.p = None
         self.messages = messages
         self._validate_input()
+        file_name = Utils.get_params()['TextFile']
         if action is Action.Write:
-            file_name = Utils.get_params()['TextFile']
-            os.remove(file_name)
+            if os.path.exists(file_name):
+                os.remove(file_name)
 
     def get_process(self):
         """
