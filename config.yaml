@@ -1,4 +1,4 @@
 # In this property file we can configure to run with TF or MONGODB
 TextFile: "messageManager.txt"
-RunOn: "TF"
-#RunOn: "MDB"
+#RunOn: "TF"
+RunOn: "MDB"

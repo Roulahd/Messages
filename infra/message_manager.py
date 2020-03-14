@@ -6,7 +6,6 @@ import pymongo
 class MessageManager(object):
 
     lock = False
-    started = True
     mongo_db_counter = 1
 
     @staticmethod
@@ -19,10 +18,8 @@ class MessageManager(object):
         """
         run_on = Utils.get_params()['RunOn']
         MessageManager._wait_while_locked()
-        MessageManager._clean_data_base()
 
         if run_on == 'TF':
-            # Remove text file only if message manager just started
             file_name = Utils.get_params()['TextFile']
             with open(file_name, 'a') as db:
                 db.write('{0}\n'.format(msg))
@@ -90,22 +87,6 @@ class MessageManager(object):
         return result
 
     @staticmethod
-    def _clean_data_base():
-        """
-        This method deletes TF and Mongo DB, only on the beginning of program's life
-        :return:
-        """
-        run_on = Utils.get_params()['RunOn']
-        if run_on == 'TF':
-            file_name = Utils.get_params()['TextFile']
-            if os.path.exists(file_name) and MessageManager.started:
-                os.remove(file_name)
-        else:
-            if MessageManager.started:
-                MessageManager._clean_mongo_db_databases()
-        MessageManager.started = False
-
-    @staticmethod
     def _wait_while_locked():
         """
         Current process waits for the lock to be released, once released it will be locked again by the current process
@@ -127,12 +108,3 @@ class MessageManager(object):
         """
         mongodb_client = pymongo.MongoClient("mongodb://localhost:27017/")
         return mongodb_client["MyDatabase"]["Messages"]
-
-    @staticmethod
-    def _clean_mongo_db_databases():
-        """
-        this method drops MongoDB collection
-        :return:
-        """
-        mongodb_client = pymongo.MongoClient("mongodb://localhost:27017/")
-        mongodb_client.drop_database('MyDatabase')

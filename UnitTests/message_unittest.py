@@ -14,10 +14,12 @@ class MessagesUnitTest(unittest.TestCase):
         message = ''.join(random.sample(s, 10))
         wp = ReadWriteProcess(action=Action.Write, messages_number=1, messages=[message])
         rp = ReadWriteProcess(action=Action.Read, messages_number=1)
-        wp.run()
-        read_result = rp.run()
-        wp.wait_for_other()
-        rp.wait_for_other()
+        write_result, write_process = wp.get_process()
+        read_result, read_process = rp.get_process()
+        write_process.start()
+        read_process.start()
+        write_process.join()
+        read_process.join()
         self.assertEqual(message, read_result[0], 'Actual: {0} Received: {1} Values are not Equal'
                          .format(message, read_result))
 
@@ -29,8 +31,9 @@ class MessagesUnitTest(unittest.TestCase):
         s = string.lowercase + string.uppercase + string.digits
         message = ''.join(random.sample(s, 10))
         wp = ReadWriteProcess(action=Action.Write, messages_number=1, messages=[message])
-        written_value = wp.run()
-        wp.wait_for_other()
+        written_value, write_process = wp.get_process()
+        write_process.start()
+        write_process.join()
         wrong_value = ''.join(random.sample(s, 9))
         self.assertNotEqual(wrong_value, written_value[0], 'Actual: {0} Received: {1} Values are Equal'
                             .format(wrong_value, written_value[0]))
@@ -44,10 +47,12 @@ class MessagesUnitTest(unittest.TestCase):
         my_random_utf_8_str = my_random_unicode_str.encode('utf-8')
         wp = ReadWriteProcess(action=Action.Write, messages_number=1, messages=[my_random_utf_8_str])
         rp = ReadWriteProcess(action=Action.Read, messages_number=1)
-        wp.run()
-        read_result = rp.run()
-        wp.wait_for_other()
-        rp.wait_for_other()
+        write_result, write_process = wp.get_process()
+        read_result, read_process = rp.get_process()
+        write_process.start()
+        read_process.start()
+        write_process.join()
+        read_process.join()
 
         try:
             read_result_msg = read_result[0].encode('utf-8')
@@ -67,11 +72,13 @@ class MessagesUnitTest(unittest.TestCase):
             messages.append(''.join(random.sample(s, 10)))
         wp = ReadWriteProcess(action=Action.Write, messages_number=100, messages=messages)
         rp = ReadWriteProcess(action=Action.Read, messages_number=100)
-        wp.run()
-        read_results = rp.run()
-        wp.wait_for_other()
-        rp.wait_for_other()
-        for message in read_results:
+        write_result, write_process = wp.get_process()
+        read_result, read_process = rp.get_process()
+        write_process.start()
+        read_process.start()
+        write_process.join()
+        read_process.join()
+        for message in read_result:
             if message not in messages:
                 self.fail('This message {0} was not written'.format(message))
 
@@ -85,10 +92,12 @@ class MessagesUnitTest(unittest.TestCase):
         messages = MessagesUnitTest._get_random_messages(messages_number_to_write, 10)
         wp = ReadWriteProcess(action=Action.Write, messages_number=messages_number_to_write, messages=messages)
         rp = ReadWriteProcess(action=Action.Read, messages_number=messages_number_to_read)
-        wp.run()
-        read_result = rp.run()
-        wp.wait_for_other()
-        rp.wait_for_other()
+        write_result, write_process = wp.get_process()
+        read_result, read_process = rp.get_process()
+        write_process.start()
+        read_process.start()
+        write_process.join()
+        read_process.join()
         self.assertEqual(messages_number_to_read, len(read_result), 'Actual messages read {0}, Expected {1}'
                          .format(len(read_result), messages_number_to_read))
         for message in read_result:
@@ -105,10 +114,12 @@ class MessagesUnitTest(unittest.TestCase):
         messages = MessagesUnitTest._get_random_messages(messages_number_to_write + 100, 10)
         wp = ReadWriteProcess(action=Action.Write, messages_number=messages_number_to_write, messages=messages)
         rp = ReadWriteProcess(action=Action.Read, messages_number=messages_number_to_read)
-        wp.run()
-        read_result = rp.run()
-        wp.wait_for_other()
-        rp.wait_for_other()
+        write_result, write_process = wp.get_process()
+        read_result, read_process = rp.get_process()
+        write_process.start()
+        read_process.start()
+        write_process.join()
+        read_process.join()
         for message in read_result:
             if message not in messages:
                 self.fail('Message {0} was not actually written'.format(message))
@@ -123,17 +134,19 @@ class MessagesUnitTest(unittest.TestCase):
         messages = MessagesUnitTest._get_random_messages(messages_number_to_write - 50, 10)
         wp = ReadWriteProcess(action=Action.Write, messages_number=messages_number_to_write, messages=messages)
         rp = ReadWriteProcess(action=Action.Read, messages_number=messages_number_to_read)
-        wp.run()
-        read_result = rp.run()
-        wp.wait_for_other()
-        rp.wait_for_other()
+        write_result, write_process = wp.get_process()
+        read_result, read_process = rp.get_process()
+        write_process.start()
+        read_process.start()
+        write_process.join()
+        read_process.join()
         for message in read_result:
             if message not in messages:
                 self.fail('Message {0} was not actually written'.format(message))
 
     def test_invalid_action(self):
         """
-        This unit test validate that read write process raises an error when we call it with invalid action
+        This unit test validate that read write process raise error when we call it with invalid action
         """
         raised = False
         try:
@@ -144,7 +157,7 @@ class MessagesUnitTest(unittest.TestCase):
 
     def test_invalid_message_number(self):
         """
-        This unit test validate that read write process raises an error when we call it with invalid message number
+        This unit test validate that read write process raise error when we call it with invalid message number
         """
         raised = False
         try:
@@ -155,7 +168,7 @@ class MessagesUnitTest(unittest.TestCase):
 
     def test_invalid_messages(self):
         """
-        This unit test validate that read write process raises an error when we call it with invalid messages list
+        This unit test validate that read write process raise error when we call it with invalid messages list
         """
         raised = False
         try:
@@ -164,17 +177,19 @@ class MessagesUnitTest(unittest.TestCase):
             raised = True
         self.assertTrue(raised, 'Invalid Messages type')
 
-    def test_default_write(self):
+    def test_automatic_write(self):
         """
         The unit test is to write number of messages without giving the messages list as input
         The read write process should handle this situation by generating messages for us
         """
-        wp = ReadWriteProcess(action=Action.Write, messages_number=100,)
+        wp = ReadWriteProcess(action=Action.Write, messages_number=100)
         wr = ReadWriteProcess(action=Action.Read, messages_number=100)
-        wp.run()
-        read_results = wr.run()
-        wp.wait_for_other()
-        wr.wait_for_other()
+        write_result, write_process = wp.get_process()
+        read_results, read_process = wr.get_process()
+        write_process.start()
+        read_process.start()
+        write_process.join()
+        read_process.join()
 
         for i, result in enumerate(read_results):
             expected = 'My Message #: {0}'.format(str(i + 1))
@@ -186,12 +201,10 @@ class MessagesUnitTest(unittest.TestCase):
     """
     @staticmethod
     def _random_utf8(length):
-        """ This method creates a random utf8 with specific length"""
         return u''.join(unichr(random.randint(0x80, sys.maxunicode)) for _ in range(length))
 
     @staticmethod
     def _get_random_messages(messages_number, length):
-        """ this method creates a random message list"""
         messages = []
         s = string.lowercase + string.uppercase + string.digits
         for _ in range(messages_number):

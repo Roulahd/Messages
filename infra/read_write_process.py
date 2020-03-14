@@ -1,6 +1,10 @@
 from message_manager import MessageManager
 import multiprocessing
 import enum
+from infra.utils import Utils
+import os
+import pymongo
+
 
 # Enum for process type (read/write)
 class Action(enum.Enum):
@@ -20,8 +24,14 @@ class ReadWriteProcess(object):
         self.p = None
         self.messages = messages
         self._validate_input()
+        file_name = Utils.get_params()['TextFile']
+        if action is Action.Write:
+            if os.path.exists(file_name):
+                os.remove(file_name)
+            mongodb_client = pymongo.MongoClient("mongodb://localhost:27017/")
+            mongodb_client.drop_database('MyDatabase')
 
-    def run(self):
+    def get_process(self):
         """
         This method creates read/write processes
         :return: read/written values
@@ -29,16 +39,8 @@ class ReadWriteProcess(object):
         manager = multiprocessing.Manager()
         return_results = manager.list()
         self.p = multiprocessing.Process(target=self._execute_action, args=(0, return_results))
-        self.p.start()
-        return return_results
+        return return_results, self.p
 
-    def wait_for_other(self):
-        """
-        Joins processes
-        """
-        self.p.join()
-
-    # this method execute read write processes
     def _execute_action(self, i, return_results):
         """
         This method executes read/write processes
