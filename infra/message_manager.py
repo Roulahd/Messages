@@ -16,7 +16,7 @@ class MessageManager(object):
 
         with open(file_name, 'a') as db:
             db.write('{0}\n'.format(msg))
-            print('[**] WRITE: ' + msg)
+            # print('[**] WRITE: ' + msg) # Was only for debugging
         MessageManager.lock = False
 
     @staticmethod
