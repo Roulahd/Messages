@@ -133,7 +133,7 @@ class MessagesUnitTest(unittest.TestCase):
 
     def test_invalid_action(self):
         """
-        TODO
+        This unit test validate that read write process raise error when we call it with invalid action
         """
         raised = False
         try:
@@ -144,7 +144,7 @@ class MessagesUnitTest(unittest.TestCase):
 
     def test_invalid_message_number(self):
         """
-        TODO
+        This unit test validate that read write process raise error when we call it with invalid message number
         """
         raised = False
         try:
@@ -155,7 +155,7 @@ class MessagesUnitTest(unittest.TestCase):
 
     def test_invalid_messages(self):
         """
-        TODO
+        This unit test validate that read write process raise error when we call it with invalid messages list
         """
         raised = False
         try:
