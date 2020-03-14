@@ -10,8 +10,8 @@ class MessageManager(object):
     @staticmethod
     def write_msg(msg):
         """
-        This method writes given or default message on TF or MongoDB
-        Will wait for: lock to be false - Because we don't want two processes using the TF or MongoDB in the same time
+        This method writes given or default message on TF
+        Will wait for: lock to be false - Because we don't want two processes using the TF in the same time
         :param msg: message to write
         :return:
         """
@@ -28,9 +28,9 @@ class MessageManager(object):
     @staticmethod
     def read_msg(index):
         """
-        This method reads message given a specific index in regards of TF or MongoDB
+        This method reads message given a specific index in regards of TF 
         Will wait for:
-        1- lock to be false - Because we don't want two processes using the TF or MongoDB in the same time
+        1- lock to be false - Because we don't want two processes using the in the same time
         2- Wait for the entry in the specific index to be written in order to read it,
            Because we may have some cases the read process is ahead of the write process
         :param index: where to read
