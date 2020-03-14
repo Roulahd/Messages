@@ -4,7 +4,6 @@ import os
 
 class MessageManager(object):
     lock = False
-    started = False
 
     @staticmethod
     def write_msg(msg):
@@ -15,8 +14,6 @@ class MessageManager(object):
         :return:
         """
         MessageManager._wait_while_locked()
-        # Remove text file only if message manager just started
-        MessageManager._remove_text_file()
         file_name = Utils.get_params()['TextFile']
 
         with open(file_name, 'a') as db:
@@ -58,19 +55,6 @@ class MessageManager(object):
         print('[*] READ: ' + result)
         MessageManager.lock = False
         return result
-
-    @staticmethod
-    def _remove_text_file():
-        """
-        This method deletes TF only on the beginning of program's life
-        :return:
-        """
-        file_name = Utils.get_params()['TextFile']
-        if not os.path.exists(file_name):
-            MessageManager.started = True
-        elif os.path.exists(file_name) and MessageManager.started is False:
-            os.remove(file_name)
-            MessageManager.started = True
 
     @staticmethod
     def _wait_while_locked():
