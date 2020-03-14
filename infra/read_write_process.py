@@ -16,8 +16,9 @@ class ReadWriteProcess(object):
 
     def __init__(self, action, messages_number, messages=None):
         """
-        :param Action(action):
-        :param int(messages_number):
+        :param Action(action): read or write
+        :param int(messages_number): how many messages to be read/written
+        :param list(messages): list of messages to read or write
         """
         self.messages_number = messages_number
         self.action = action
@@ -28,6 +29,7 @@ class ReadWriteProcess(object):
         if action is Action.Write:
             if os.path.exists(file_name):
                 os.remove(file_name)
+            # delete either way, drop method knows to handle existing and non-existing DB's
             mongodb_client = pymongo.MongoClient("mongodb://localhost:27017/")
             mongodb_client.drop_database('MyDatabase')
 

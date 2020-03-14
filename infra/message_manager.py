@@ -32,7 +32,6 @@ class MessageManager(object):
             col.insert_one(write_msg)
             # For debugging only
             # print('[**] WRITE: ' + msg)
-
         MessageManager.lock = False
 
     @staticmethod
