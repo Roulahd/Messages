@@ -2,7 +2,7 @@ from message_manager import MessageManager
 import multiprocessing
 import enum
 
-
+# Enum for process type (read/write)
 class Action(enum.Enum):
     Write = 1
     Read = 2
@@ -22,6 +22,10 @@ class ReadWriteProcess(object):
         self._validate_input()
 
     def run(self):
+        """
+        This method creates read/write processes
+        :return: read/written values
+        """
         manager = multiprocessing.Manager()
         return_results = manager.list()
         self.p = multiprocessing.Process(target=self._execute_action, args=(0, return_results))
@@ -29,9 +33,17 @@ class ReadWriteProcess(object):
         return return_results
 
     def wait_for_other(self):
+        """
+        Joins processes
+        """
         self.p.join()
 
+    # this method execute read write processes
     def _execute_action(self, i, return_results):
+        """
+        This method executes read/write processes
+        :param return_results: shared data between current process and main process
+        """
         if self.messages:
             if self.messages_number > len(self.messages):
                 self.messages_number = len(self.messages)
@@ -49,6 +61,9 @@ class ReadWriteProcess(object):
                 return_results.append(return_result)
 
     def _validate_input(self):
+        """
+        This method validates process is not executed with invalid inputs and raises errors accordingly
+        """
         if not isinstance(self.action, Action):
             raise ValueError("Unknown Action")
         if not isinstance(self.messages_number, int):

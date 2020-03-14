@@ -7,12 +7,16 @@ class MessageManager(object):
 
     lock = False
     started = True
-    mongoDBcounter = 1
-    mongodb_client = None
-    my_col = None
+    mongo_db_counter = 1
 
     @staticmethod
     def write_msg(msg):
+        """
+        This method writes given or default message on TF or MongoDB
+        Will wait for: lock to be false - Because we don't want two processes using the TF or MongoDB in the same time
+        :param msg: message to write
+        :return:
+        """
         run_on = Utils.get_params()['RunOn']
         MessageManager._wait_while_locked()
         MessageManager._clean_data_base()
@@ -22,19 +26,29 @@ class MessageManager(object):
             file_name = Utils.get_params()['TextFile']
             with open(file_name, 'a') as db:
                 db.write('{0}\n'.format(msg))
-                print('[**] WRITE: ' + msg)
+                # For debugging only
+                # print('[**] WRITE: ' + msg)
         else:
-            # Remove text file only if message manager just started
-            write_msg = {"id": str(MessageManager.mongoDBcounter), "message": msg}
-            MessageManager.mongoDBcounter += 1
+            write_msg = {"id": str(MessageManager.mongo_db_counter), "message": msg}
+            MessageManager.mongo_db_counter += 1
             col = MessageManager._get_collection()
             col.insert_one(write_msg)
-            print('[**] WRITE: ' + msg)
+            # For debugging only
+            # print('[**] WRITE: ' + msg)
 
         MessageManager.lock = False
 
     @staticmethod
     def read_msg(index):
+        """
+        This method reads message given a specific index in regards of TF or MongoDB
+        Will wait for:
+        1- lock to be false - Because we don't want two processes using the TF or MongoDB in the same time
+        2- Wait for the entry in the specific index to be written in order to read it,
+           Because we may have some cases the read process is ahead of the write process
+        :param index: where to read
+        :return: return read message
+        """
         run_on = Utils.get_params()['RunOn']
         result = ""
         if run_on == 'TF':
@@ -78,7 +92,7 @@ class MessageManager(object):
     @staticmethod
     def _clean_data_base():
         """
-        Supporting both Text file or MongoDB
+        This method deletes TF and Mongo DB, only on the beginning of program's life
         :return:
         """
         run_on = Utils.get_params()['RunOn']
@@ -93,6 +107,10 @@ class MessageManager(object):
 
     @staticmethod
     def _wait_while_locked():
+        """
+        Current process waits for the lock to be released, once released it will be locked again by the current process
+        :return:
+        """
         while True:
             if not MessageManager.lock:
                 MessageManager.lock = True
@@ -103,20 +121,18 @@ class MessageManager(object):
     """
     @staticmethod
     def _get_collection():
-        if MessageManager.mongodb_client is None:
-            MessageManager.mongodb_client = pymongo.MongoClient("mongodb://localhost:27017/")
-            if "MyDatabase" in MessageManager.mongodb_client.list_database_names():
-                my_db = MessageManager.mongodb_client.get_database("MyDatabase")
-            else:
-                my_db = MessageManager.mongodb_client["MyDatabase"]
-            if "Messages" in my_db.collection_names():
-                MessageManager.my_col = my_db.get_collection("Messages")
-            else:
-                MessageManager.my_col = my_db["Messages"]
-        return MessageManager.my_col
+        """
+        This method returns Mongo DB collection
+        :return: MongoDB collection
+        """
+        mongodb_client = pymongo.MongoClient("mongodb://localhost:27017/")
+        return mongodb_client["MyDatabase"]["Messages"]
 
     @staticmethod
     def _clean_mongo_db_databases():
-        client = pymongo.MongoClient("mongodb://localhost:27017/")
-        client.drop_database('MyDatabase')
-        client.drop_database('mydatabase')
+        """
+        this method drops MongoDB collection
+        :return:
+        """
+        mongodb_client = pymongo.MongoClient("mongodb://localhost:27017/")
+        mongodb_client.drop_database('MyDatabase')

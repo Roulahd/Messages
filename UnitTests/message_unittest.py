@@ -133,7 +133,7 @@ class MessagesUnitTest(unittest.TestCase):
 
     def test_invalid_action(self):
         """
-        This unit test validate that read write process raise error when we call it with invalid action
+        This unit test validate that read write process raises an error when we call it with invalid action
         """
         raised = False
         try:
@@ -144,7 +144,7 @@ class MessagesUnitTest(unittest.TestCase):
 
     def test_invalid_message_number(self):
         """
-        This unit test validate that read write process raise error when we call it with invalid message number
+        This unit test validate that read write process raises an error when we call it with invalid message number
         """
         raised = False
         try:
@@ -155,7 +155,7 @@ class MessagesUnitTest(unittest.TestCase):
 
     def test_invalid_messages(self):
         """
-        This unit test validate that read write process raise error when we call it with invalid messages list
+        This unit test validate that read write process raises an error when we call it with invalid messages list
         """
         raised = False
         try:
@@ -163,15 +163,35 @@ class MessagesUnitTest(unittest.TestCase):
         except ValueError:
             raised = True
         self.assertTrue(raised, 'Invalid Messages type')
+
+    def test_default_write(self):
+        """
+        The unit test is to write number of messages without giving the messages list as input
+        The read write process should handle this situation by generating messages for us
+        """
+        wp = ReadWriteProcess(action=Action.Write, messages_number=100,)
+        wr = ReadWriteProcess(action=Action.Read, messages_number=100)
+        wp.run()
+        read_results = wr.run()
+        wp.wait_for_other()
+        wr.wait_for_other()
+
+        for i, result in enumerate(read_results):
+            expected = 'My Message #: {0}'.format(str(i + 1))
+            self.assertEqual(result, expected, 'Actual messages read {0}, Expected {1}'
+                             .format(result, expected))
+
     """
     Helper Methods
     """
     @staticmethod
     def _random_utf8(length):
+        """ This method creates a random utf8 with specific length"""
         return u''.join(unichr(random.randint(0x80, sys.maxunicode)) for _ in range(length))
 
     @staticmethod
     def _get_random_messages(messages_number, length):
+        """ this method creates a random message list"""
         messages = []
         s = string.lowercase + string.uppercase + string.digits
         for _ in range(messages_number):
