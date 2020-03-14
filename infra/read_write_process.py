@@ -37,15 +37,16 @@ class ReadWriteProcess(object):
                 self.messages_number = len(self.messages)
         for i in range(self.messages_number):
             if self.action == Action.Read:
-                read_message = MessageManager.read_msg(i)
-                return_results.append(read_message)
+                return_result = MessageManager.read_msg(i)
+                return_results.append(return_result)
             elif self.action == Action.Write:
                 if self.messages:
+                    return_result = self.messages[i]
                     MessageManager.write_msg(self.messages[i])
                 else:
-                    self.messages = 'My Message #: ' + str(i + 1)
+                    return_result = 'My Message #: ' + str(i + 1)
                     MessageManager.write_msg('My Message #: ' + str(i + 1))
-                return_results.append(self.messages)
+                return_results.append(return_result)
 
     def _validate_input(self):
         if not isinstance(self.action, Action):

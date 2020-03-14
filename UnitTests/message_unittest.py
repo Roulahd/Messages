@@ -163,6 +163,24 @@ class MessagesUnitTest(unittest.TestCase):
         except ValueError:
             raised = True
         self.assertTrue(raised, 'Invalid Messages type')
+
+    def test_automatic_write(self):
+        """
+        The unit test is to write number of messages without giving the messages list as input
+        The read write process should handle this situation by generating messages for us
+        """
+        wp = ReadWriteProcess(action=Action.Write, messages_number=100,)
+        wr = ReadWriteProcess(action=Action.Read, messages_number=100)
+        wp.run()
+        read_results = wr.run()
+        wp.wait_for_other()
+        wr.wait_for_other()
+
+        for i, result in enumerate(read_results):
+            expected = 'My Message #: {0}'.format(str(i + 1))
+            self.assertEqual(result, expected, 'Actual messages read {0}, Expected {1}'
+                             .format(result, expected))
+
     """
     Helper Methods
     """
