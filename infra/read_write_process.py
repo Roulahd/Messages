@@ -1,6 +1,8 @@
 from message_manager import MessageManager
 import multiprocessing
 import enum
+from infra.utils import Utils
+import os
 
 # Enum for process type (read/write)
 class Action(enum.Enum):
@@ -20,8 +22,11 @@ class ReadWriteProcess(object):
         self.p = None
         self.messages = messages
         self._validate_input()
+        if action is Action.Write:
+            file_name = Utils.get_params()['TextFile']
+            os.remove(file_name)
 
-    def run(self):
+    def get_process(self):
         """
         This method creates read/write processes
         :return: read/written values
@@ -29,14 +34,7 @@ class ReadWriteProcess(object):
         manager = multiprocessing.Manager()
         return_results = manager.list()
         self.p = multiprocessing.Process(target=self._execute_action, args=(0, return_results))
-        self.p.start()
-        return return_results
-
-    def wait_for_other(self):
-        """
-        Joins processes
-        """
-        self.p.join()
+        return return_results, self.p
 
     def _execute_action(self, i, return_results):
         """

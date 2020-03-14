@@ -3,9 +3,8 @@ import os
 
 
 class MessageManager(object):
-
     lock = False
-    started = True
+    started = False
 
     @staticmethod
     def write_msg(msg):
@@ -37,7 +36,7 @@ class MessageManager(object):
         :return: return read message
         """
         file_name = Utils.get_params()['TextFile']
-        # While File doesn't exist, it will run only once, when Write create the file first time
+        # While File doesn't exist, it will get_process only once, when Write create the file first time
         while True:
             MessageManager._wait_while_locked()
             if os.path.exists(file_name):
@@ -67,9 +66,11 @@ class MessageManager(object):
         :return:
         """
         file_name = Utils.get_params()['TextFile']
-        if os.path.exists(file_name) and MessageManager.started:
+        if not os.path.exists(file_name):
+            MessageManager.started = True
+        elif os.path.exists(file_name) and MessageManager.started is False:
             os.remove(file_name)
-            MessageManager.started = False
+            MessageManager.started = True
 
     @staticmethod
     def _wait_while_locked():

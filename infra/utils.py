@@ -16,3 +16,4 @@ class Utils(object):
         with open(config_file, 'r') as yaml_config:
             cfg = yaml.load(yaml_config)
         return cfg
+
